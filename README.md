@@ -2,13 +2,13 @@
 Run a array of parameters through a function in parallel, but throttled.
 
 ## Install 
-```
+```bash
 npm install promise-parallel-throttle -S
 ```
 
 ## Usage
 
-```
+```js
 //import the lib or use require, or whatever you fancy
 import ParallelPromiseThrottle from 'ParallelPromiseThrottle';
 
@@ -42,7 +42,7 @@ The progressCallback returns the following properties:
 
 The eventual result is a object looking like this:
 
-```
+```js
 const result = {
   completed: [],
   aborted: []
@@ -53,7 +53,7 @@ const result = {
 
 ## Fancy an example what this actually means? WATCH!
 
-```
+```js
 //array of array containing a firstname and lastname we want to combine, with a nice space in between.
 const names = [
 	["Irene", "Pullman"],
@@ -103,20 +103,9 @@ const slowCombineNames = (firstName, lastName) => {
 
 ```
 
-The result of this snippet will be a long log containing the progress (to long to show here since the result keeps increasing).
-But the last log is what we are interested in, this will have a Object following this spec;
-
-```
-const result = {
-  completed: [],
-  aborted: [],
-}
-```
-
-Where completed are the result of the Promises which completed succefully and aborted is a array with failed Promises their reject result.
 
 Taking our code snippit in account, the result would look something like this:
-```
+```js
 { aborted: [],
   completed:
    [ 'Irene Pullman',
