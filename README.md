@@ -1,2 +1,141 @@
 # Promise-parallel-throttle
-Run multiple promises throttled
+Run a array of parameters through a function in parallel, but throttled.
+
+## Install 
+```
+npm install promise-parallel-throttle -S
+```
+
+## Usage
+
+```
+//import the lib or use require, or whatever you fancy
+import ParallelPromiseThrottle from 'ParallelPromiseThrottle';
+
+function worker(param1, param2) {
+  return new Promise((resolve, reject) => {
+    //do stuff
+  }
+}
+
+let paramsArray = [["param1", "param2"],["param1", "param2"],["param1", "param2"]];
+let result = ParallelPromiseThrottle(worker, paramsArray);
+
+//result will contain a object with two arrays (completed & aborted), containing the result of 'worker' with the different params out of the paramsArray.
+```
+
+## API
+`ParallelPromiseThrottle` requires only 2 parameters to work properly, the function to process and a array with parameters for this function. However there are more options!
+`ParallelPromiseThrottle(task, paramsArray, maxInProgress = 3, abortOnError = false, progressCallback)`
+
+* task             = function to run
+* paramsArray      = params to pass on the the function
+* maxInProgress    = max amount of parallel threads
+* abortOnError     = reject after a single error, or keep running
+* progressCallback = callback with progress reports
+
+The progressCallback returns the following properties:
+
+* amountStarted = amount of tasks started
+* amountDone    = amount of tasks which are done
+* result        = object containing the Result (explained below)
+
+The eventual result is a object looking like this:
+
+```
+const result = {
+  completed: [],
+  aborted: []
+}
+```
+* completed = array containing all the results of the task
+* aborted   = array containing all the errors of the different tasks (if any)
+
+## Fancy an example what this actually means? WATCH!
+
+```
+//array of array containing a firstname and lastname we want to combine, with a nice space in between.
+const names = [
+	["Irene", "Pullman"],
+	["Sean", "Parr"],
+	["Joe", "Slater"],
+	["Karen", "Turner"],
+	["Tim", "Black"],
+	["Caroline", "Thomson"],
+	["Blake", "Scott"],
+	["Simon", "Cornish"],
+	["Anne", "Glover"],
+	["Ruth", "Lewis"],
+	["Hannah", "Stewart"],
+	["Molly", "Wilson"],
+	["Andrew", "MacLeod"],
+	["Katherine", "Hardacre"],
+	["Ava", "Campbell"],
+	["Melanie", "Bailey"],
+	["Audrey", "Fisher"],
+	["Felicity", "McLean"]
+];
+
+//Crazy slow Promise which actually does what we want!
+const slowCombineNames = (firstName, lastName) => {
+	return new Promise((resolve, reject) => {
+		//do stuff here ;]
+		setTimeout(() => resolve(firstName + " " + lastName), (Math.random() * (1000 - 500) + 500));	
+	});
+}
+
+//Well lets start this off, but since the combine method is so slow we want to run the combining of names in parallel (but not too much because imagine a slow server which can't handle too many connections, or another scenario involving high cpu load / memory usage on a server or your machine)
+//to still get a fast result we want to run but a few in parallel!
+(async function kickOff() {
+
+  //kickoff the ParallelPromiseThrottle with;
+    //a function it must run
+    //the array with parameters this function will receive
+    //the amount of parallel "threads"
+    //wether we abort on a single error or go on
+    //a callback which gives us insight in the progress, containing (amount started, amount completed, current result)
+    
+	const awesomeNames = await ParallelPromiseThrottle(slowCombineNames, names, 3, false, (...progressArgs) => {
+		console.log(progressArgs);
+	});
+	console.log(awesomeNames);
+})();
+
+```
+
+The result of this snippet will be a long log containing the progress (to long to show here since the result keeps increasing).
+But the last log is what we are interested in, this will have a Object following this spec;
+
+```
+const result = {
+  completed: [],
+  aborted: [],
+}
+```
+
+Where completed are the result of the Promises which completed succefully and aborted is a array with failed Promises their reject result.
+
+Taking our code snippit in account, the result would look something like this:
+```
+{ aborted: [],
+  completed:
+   [ 'Irene Pullman',
+     'Joe Slater',
+     'Sean Parr',
+     'Tim Black',
+     'Karen Turner',
+     'Caroline Thomson',
+     'Blake Scott',
+     'Simon Cornish',
+     'Anne Glover',
+     'Ruth Lewis',
+     'Hannah Stewart',
+     'Molly Wilson',
+     'Andrew MacLeod',
+     'Katherine Hardacre',
+     'Ava Campbell',
+     'Melanie Bailey',
+     'Felicity McLean',
+     'Audrey Fisher' ] 
+}
+```
