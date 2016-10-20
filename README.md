@@ -9,8 +9,7 @@ npm install promise-parallel-throttle -S
 ## Usage
 
 ```js
-//import the lib or use require, or whatever you fancy
-import ParallelPromiseThrottle from 'ParallelPromiseThrottle';
+const ParallelPromiseThrottle = require('promise-parallel-throttle');
 
 function worker(param1, param2) {
   return new Promise((resolve, reject) => {

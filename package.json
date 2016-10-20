@@ -1,0 +1,19 @@
+{
+  "name": "promise-parallel-throttle",
+  "version": "1.0.0",
+  "description": "Run promises in parallel, but throttled",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DJWassink/Promise-parallel-throttle.git"
+  },
+  "author": "\"Dirk-Jan Wassink <dirk.jan.wassink@gmail.com> (http://dirkjanwassink.nl)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DJWassink/Promise-parallel-throttle/issues"
+  },
+  "homepage": "https://github.com/DJWassink/Promise-parallel-throttle#readme"
+}

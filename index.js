@@ -1,4 +1,4 @@
-export default function(task, paramsArray, maxInProgress = 3, abortOnError = false, progressCallback) => {
+function runner(task, paramsArray, maxInProgress = 3, abortOnError = false, progressCallback) {
 	return new Promise((resolve, reject) => {
 		const result = {
 			aborted: [],
@@ -29,3 +29,5 @@ export default function(task, paramsArray, maxInProgress = 3, abortOnError = fal
 		}
 	});
 }
+
+module.exports = runner;
