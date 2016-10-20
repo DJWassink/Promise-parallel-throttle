@@ -13,14 +13,23 @@ const ParallelPromiseThrottle = require('promise-parallel-throttle');
 
 function worker(param1, param2) {
   return new Promise((resolve, reject) => {
-    //do stuff
+    //do some difficult stuff here
+    resolve(param1 + param2);
   }
 }
 
-let paramsArray = [["param1", "param2"],["param1", "param2"],["param1", "param2"]];
+let paramsArray = [[5, 8],[1337, 1337],[4, 6]];
 let result = ParallelPromiseThrottle(worker, paramsArray);
 
-//result will contain a object with two arrays (completed & aborted), containing the result of 'worker' with the different params out of the paramsArray.
+//result is:
+result = {
+  completed: [13, 2674, 10],
+  aborted: []
+}
+
+//as you can see result will contain two arrays, completed and aborted.
+//completed contains the result of the Promise if it succeeded
+//aborted contains the error of the Promises which failed
 ```
 
 ## API
