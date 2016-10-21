@@ -23,13 +23,13 @@ let result = ParallelPromiseThrottle(worker, paramsArray);
 
 //result is:
 result = {
-  completed: [13, 2674, 10],
+  completed: [{result: 13, params: [5,8]}, {result: 2674, params: [1337,1337]}, {result: 10, params: [4,6]}],
   aborted: []
 }
 
 //as you can see result will contain two arrays, completed and aborted.
-//completed contains the result of the Promise if it succeeded
-//aborted contains the error of the Promises which failed
+//completed contains the result and params of the Promise if it succeeded 
+//aborted contains the error and params of the Promises which failed
 ```
 
 ## API
@@ -46,18 +46,18 @@ The progressCallback returns the following properties:
 
 * amountStarted = amount of tasks started
 * amountDone    = amount of tasks which are done
-* result        = object containing the Result (explained below)
+* result        = object containing the Result object (explained below)
 
-The eventual result is a object looking like this:
+The eventual Result is a object looking like this:
 
 ```js
 const result = {
-  completed: [],
-  aborted: []
+  completed: [{result: '', params: ''}],
+  aborted: [{error: '', params: ''}]
 }
 ```
-* completed = array containing all the results of the task
-* aborted   = array containing all the errors of the different tasks (if any)
+* completed = array containing all the results and params of a task {result: promiseResult, params: workerParams}
+* aborted   = array containing all the errors and params of the different tasks (if any) {error: taskReject, params: params}
 
 ## Fancy an example what this actually means? WATCH!
 
@@ -116,23 +116,25 @@ Taking our code snippit in account, the result would look something like this:
 ```js
 { aborted: [],
   completed:
-   [ 'Irene Pullman',
-     'Joe Slater',
-     'Sean Parr',
-     'Tim Black',
-     'Karen Turner',
-     'Caroline Thomson',
-     'Blake Scott',
-     'Simon Cornish',
-     'Anne Glover',
-     'Ruth Lewis',
-     'Hannah Stewart',
-     'Molly Wilson',
-     'Andrew MacLeod',
-     'Katherine Hardacre',
-     'Ava Campbell',
-     'Melanie Bailey',
-     'Felicity McLean',
-     'Audrey Fisher' ] 
+    [
+      {result: 'Irene Pullman', params: ['Irene', 'Pullman']},
+      {result: 'Joe Slater', params: ['Joe', 'Slater']},
+      {result: 'Sean Parr', params: ['Sean', 'Parr']},
+      {result: 'Tim Black', params: ['Tim', 'Black']},
+      {result: 'Karen Turner', params: ['Karen', 'Turner']},
+      {result: 'Caroline Thomson', params: ['Caroline', 'Thomson']},
+      {result: 'Blake Scott', params: ['Blake', 'Scott']},
+      {result: 'Simon Cornish', params: ['Simon', 'Cornish']},
+      {result: 'Anne Glover', params: ['Anne', 'Glover']},
+      {result: 'Ruth Lewis', params: ['Ruth', 'Lewis']},
+      {result: 'Hannah Stewart', params: ['Hannah', 'Stewart']},
+      {result: 'Molly Wilson', params: ['Molly', 'Wilson']},
+      {result: 'Andrew MacLeod', params: ['Andrew', 'MacLeod']},
+      {result: 'Katherine Hardacre', params: ['Katherine', 'Hardacre']},
+      {result: 'Ava Campbell', params: ['Ava', 'Campbell']},
+      {result: 'Melanie Bailey', params: ['Melanie', 'Bailey']},
+      {result: 'Felicity McLean', params: ['Felicity', 'McLean']},
+      {result: 'Audrey Fisher',  params: ['Audrey', 'Fisher']}
+    ]
 }
 ```

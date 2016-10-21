@@ -8,15 +8,16 @@ function runner(task, paramsArray, maxInProgress = 3, abortOnError = false, prog
 		let done = 0;
 
 		const executeTask = (index) => {
-			task(...paramsArray[index])
+			const params = ...paramsArray[index];
+			task(params)
 				.then(taskResult => {
-					result.completed.push(taskResult);
+					result.completed.push({result: taskResult, params: params});
 					if (started < paramsArray.length) executeTask(started++);
 					done++;
 					if (progressCallback) progressCallback(done, started, result);
 					if (done == paramsArray.length) resolve(result);
 				}, error => {
-					result.aborted.push(error);
+					result.aborted.push({error: error, params: params});
 					if (abortOnError) return reject(result);
 					done++;
 					if (progressCallback) progressCallback(done, started, result);
