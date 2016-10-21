@@ -12,17 +12,19 @@ function runner(task, paramsArray, maxInProgress = 3, abortOnError = false, prog
 			task(params)
 				.then(taskResult => {
 					result.completed.push({result: taskResult, params: params});
-					if (started < paramsArray.length) executeTask(started++);
-					done++;
-					if (progressCallback) progressCallback(done, started, result);
-					if (done == paramsArray.length) resolve(result);
+					resultHandler();
 				}, error => {
 					result.aborted.push({error: error, params: params});
 					if (abortOnError) return reject(result);
-					done++;
-					if (progressCallback) progressCallback(done, started, result);
-					if (done == paramsArray.length) resolve(result);
+					resultHandler();
 				})
+		}
+		
+		const resultHandler = () => {
+			if (started < paramsArray.length) executeTask(started++);
+			done++;
+			if (progressCallback) progressCallback(done, started, result);
+			if (done == paramsArray.length) resolve(result);			
 		}
 
 		for (let i = 0; i < maxInProgress; i++) {
