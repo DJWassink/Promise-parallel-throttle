@@ -1,5 +1,7 @@
 # Promise-parallel-throttle
-Run a array of parameters through a function in parallel, but throttled.
+[![Build Status](https://travis-ci.org/DJWassink/Promise-parallel-throttle.svg?branch=master)](https://travis-ci.org/DJWassink/Promise-parallel-throttle)
+
+Run a array of Promises in parallel. Kinda like Promise.all(), but throttled!
 
 ## Install 
 ```bash
