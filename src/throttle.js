@@ -1,4 +1,4 @@
-export default function throttle(tasks, maxInProgress = 3, abortOnError = false, progressCallback) {
+export default function runner(tasks, maxInProgress = 3, abortOnError = false, progressCallback) {
 	return new Promise((resolve, reject) => {
 		const result = {
 			amountDone: 0,
