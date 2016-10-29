@@ -37,23 +37,23 @@ console.log(formattedNames); //['Irene Pullman', 'Sean Parr']
 
 `Throttle(task, maxInProgress = 3, abortOnError = false, progressCallback)`
 
-|Parameter|Default|Defenition|
-|---|---|---|
-|tasks|Required array|queue to run|
-|maxInProgress |3| max amount of parallel threads|
-|abortOnError |false| reject after a single error, or keep running|
-|progressCallback |Optional function| callback with progress reports|
+|Parameter|Type|Default|Defenition|
+|:---|:---|:---|:---|
+|tasks|Array|Required|queue to run|
+|maxInProgress |Integer|3| max amount of parallel threads|
+|abortOnError |Boolean|false| reject after a single error, or keep running|
+|progressCallback |Function|Optional| callback with progress reports|
 
 ### Result / Progress callback
 The progressCallback and the Throttle itself will return a object with the following properties:
 
-|Property|Start value|Defenition|
-|---|---|---|
-|amountDone|0|amount of tasks which are finished|
-|amountStarted|0|amount of tasks which started|
-|amountResolved|0|amount of tasks which successfully resolved|
-|amountRejected|0|amount of tasks which errored and are aborted|
-|tasks|Shallow copy of tasks array|array of tasks to be run or a finished task iits result (get's updated over time)|
+|Property|Type|Start value|Defenition|
+|:---|:---|:---|:---|
+|amountDone|Integer|0|amount of tasks which are finished|
+|amountStarted|Integer|0|amount of tasks which started|
+|amountResolved|Integer|0|amount of tasks which successfully resolved|
+|amountRejected|Integer|0|amount of tasks which errored and are aborted|
+|tasks|Array|Shallow copy of tasks array|array of tasks to be run which periodically get replaced with it's result (get's updated over time)|
 
 ## Example
 Check out the example's directory, it's heavily documented so it should be easy to follow.
