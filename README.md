@@ -4,8 +4,15 @@
 Run a array of Promises in parallel. Kinda like Promise.all(), but throttled!
 
 ## Install 
+
+### NPM
 ```bash
 npm i promise-parallel-throttle -S
+```
+
+### Yarn
+```bash
+yarn add promise-parallel-throttle
 ```
 
 ## Usage
@@ -56,7 +63,7 @@ For the defenition of the other parameters see [Throttle.raw](#Throttle.raw)
 |Parameter|Type|Default|Definition|
 |:---|:---|:---|:---|
 |tasks|Array|Required|queue to run|
-|maxInProgress |Integer|3| max amount of parallel threads|
+|maxInProgress |Integer|5| max amount of parallel threads|
 |failFast |Boolean|false| reject after a single error, or keep running|
 |progressCallback |Function|Optional| callback with progress reports|
 |nextCheck |Function|Optional| function which should return a promise, if the promise resolved next task is spawn|
@@ -95,3 +102,15 @@ Then you could write logic inside a `nextCheck` function which resolves after th
 
 ## Example
 Check out the example's directory, it's heavily documented so it should be easy to follow.
+
+To run the example, at least Node 7.x.x is required, since it supports native async/await.
+
+Simply run the example with npm:
+```bash
+npm run-script names
+```
+
+Or with Yarn:
+```bash
+yarn names
+```
