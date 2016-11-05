@@ -1,4 +1,4 @@
-import Throttle from '../src/throttle';
+import * as Throttle from '../src/throttle';
 
 //array of array containing a firstName and lastName we want to combine.
 const names = [
@@ -40,11 +40,7 @@ const slowCombineNames = (firstName, lastName) => {
     const tasks = names.map(u => () => slowCombineNames(u.firstName, u.lastName));
 
     //Execute the throttle task, only the array of tasks is required, other params are optional.
-    //Params are; tasks, amount of parallel tasks, if we reject on error, optionally a update callback.
-    //The object in the update callback is exactly the same as the result object.
-    //Here we use destructoring to separate the result objects in separate variables just to showcase what the object looks like.
-    //We directly assign the tasks property to a different variable name (formattedNames), else it would conflict with the const tasks.
-    const {amountDone, amountStarted, amountResolved, amountRejected, tasks: formattedNames} = await Throttle(tasks, 3, false, (update) => console.log(update));
+    const formattedNames = await Throttle.all(tasks, 3, false, statusUpdate => console.log(statusUpdate));
 
     //Loop through the result and print the result.
     formattedNames.forEach((result, index) => {
