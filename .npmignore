@@ -4,6 +4,7 @@ tests/
 node_modules
 example
 npm-debug.log
+yarn-error.log
 .babelrc
 .travis.yml
 karma.config.js
