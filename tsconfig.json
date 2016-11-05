@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "es5",
+    "strictNullChecks": true
+  },
+  "files": [
+    "./src/throttle.ts"
+  ]
+}

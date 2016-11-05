@@ -1,5 +1,5 @@
-import expect from 'expect.js';
-import * as Throttle from '../src/throttle';
+const expect = require('chai').expect;
+const Throttle = require('../build/throttle');
 
 describe('Throttle test', function() {
 
@@ -26,7 +26,7 @@ describe('Throttle test', function() {
         const {tasks: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
-        expect(formattedNames).to.not.be.empty();
+        expect(formattedNames).to.not.be.empty;
         expect(formattedNames).to.have.length(5);
     });
 
@@ -53,9 +53,9 @@ describe('Throttle test', function() {
         const {tasks: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
-        expect(formattedNames).to.not.be.empty();
+        expect(formattedNames).to.not.be.empty;
         names.forEach((nameObject, index) => {
-            expect(formattedNames[index]).to.be(nameObject.firstName + " " + nameObject.lastName);
+            expect(formattedNames[index]).to.equal(nameObject.firstName + " " + nameObject.lastName);
         });
     });
 
@@ -85,9 +85,9 @@ describe('Throttle test', function() {
         const {tasks: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
-        expect(formattedNames).to.not.be.empty();
+        expect(formattedNames).to.not.be.empty;
         names.forEach((nameObject, index) => {
-            expect(formattedNames[index]).to.be(nameObject.firstName + " " + nameObject.lastName);
+            expect(formattedNames[index]).to.equal(nameObject.firstName + " " + nameObject.lastName);
         });
     });
 
@@ -114,7 +114,7 @@ describe('Throttle test', function() {
         const {tasks: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
-        expect(formattedNames).to.not.be.empty();
+        expect(formattedNames).to.not.be.empty;
         expect(formattedNames).to.have.length(5);
     });
 
@@ -141,12 +141,11 @@ describe('Throttle test', function() {
         try {
             const {tasks: formattedNames} = await Throttle.raw(tasks, 1, true);
         } catch (failed) {
-            expect(failed.tasks[0]).to.be.an(Error);
+            expect(failed.tasks[0]).to.be.an.instanceof(Error);
             return;
         }
 
         /* Then */
-        expect().fail("Throttle didnt abort");
+        throw new Error("Throttle didn't abort");
     });
-
 });

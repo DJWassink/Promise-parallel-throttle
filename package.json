@@ -5,9 +5,9 @@
   "main": "build/throttle.js",
   "scripts": {
     "prepublish": "npm run build",
-    "build": "babel src --out-dir build",
-    "test": "npm run build && npm run mocha",
-    "mocha": "mocha tests --recursive --require mocha.config.js"
+    "build": "rm -rf ./build && tsc && npm run declarations",
+    "test": "npm run build && mocha tests --recursive --harmony-async-await",
+    "declarations": "tsc --declaration"
   },
   "repository": {
     "type": "git",
@@ -20,11 +20,12 @@
   },
   "homepage": "https://github.com/DJWassink/Promise-parallel-throttle#readme",
   "devDependencies": {
-    "babel-cli": "^6.6.5",
-    "babel-loader": "^6.2.4",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-stage-0": "^6.5.0",
-    "expect.js": "^0.3.1",
-    "mocha": "^3.1.2"
-  }
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.46",
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2",
+    "typescript": "^2.0.7"
+  },
+  "dependencies": {}
 }
