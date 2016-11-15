@@ -1,13 +1,14 @@
 const DEFAULT_MAX = 5;
 
-export interface Result {
+export interface Result<T> {
     amountDone: number,
     amountStarted: number,
     amountResolved: number,
     amountRejected: number,
     rejectedIndexes: number[],
     resolvedIndexes: number[],
-    tasks: any[]
+    tasks: T[],
+    work: (() => Promise<T>)[]
 }
 
 /**
@@ -19,25 +20,26 @@ export interface Result {
  * @param nextCheck
  * @returns {Promise}
  */
-export const raw = (tasks: (() => Promise<any>)[],
-                    maxInProgress = DEFAULT_MAX,
-                    failFast = false,
-                    progressCallback?: Function,
-                    nextCheck: (status: Result) => Promise<any> = defaultNextTaskCheck): Promise<Result> => {
+export const raw = <T>(tasks: (() => Promise<T>)[],
+                       maxInProgress = DEFAULT_MAX,
+                       failFast = false,
+                       progressCallback?: Function,
+                       nextCheck: (status: Result<T>) => Promise<any> = defaultNextTaskCheck): Promise<Result<T>> => {
     return new Promise((resolve, reject) => {
         let failedFast = false;
-        const result: Result = {
+        const result: Result<T> = {
             amountDone: 0,
             amountStarted: 0,
             amountResolved: 0,
             amountRejected: 0,
             rejectedIndexes: [],
             resolvedIndexes: [],
-            tasks: tasks.slice(0)
+            tasks: [],
+            work: tasks.slice(0)
         };
 
         const executeTask = (index) => {
-            result.tasks[index]()
+            result.work[index]()
                 .then(taskResult => {
                     result.tasks[index] = taskResult;
                     result.resolvedIndexes.push(index);
@@ -61,7 +63,7 @@ export const raw = (tasks: (() => Promise<any>)[],
 
             result.amountDone++;
             if (progressCallback) progressCallback(result);
-            if (result.amountDone == result.tasks.length)return resolve(result);
+            if (result.amountDone == result.work.length)return resolve(result);
             nextTask();
         };
 
@@ -89,9 +91,9 @@ export const raw = (tasks: (() => Promise<any>)[],
  * @param status
  * @returns {Promise}
  */
-const defaultNextTaskCheck = (status: Result) =>
+const defaultNextTaskCheck = <T>(status: Result<T>) =>
     new Promise((resolve, reject) => {
-        if (status.amountStarted < status.tasks.length) return resolve();
+        if (status.amountStarted < status.work.length) return resolve();
         reject();
     });
 
@@ -102,10 +104,10 @@ const defaultNextTaskCheck = (status: Result) =>
  * @param progressCallback optional function to be run to get status updates
  * @param nextCheck function which should return a promise, when resolved the next task will spawn
  */
-export const sync = (tasks: (() => Promise<any>)[],
-                     failFast = true,
-                     progressCallback?: Function,
-                     nextCheck: (status: Result) => Promise<any> = defaultNextTaskCheck): Promise<Array<any>> =>
+export const sync = <T>(tasks: (() => Promise<T>)[],
+                        failFast = true,
+                        progressCallback?: Function,
+                        nextCheck: (status: Result<T>) => Promise<any> = defaultNextTaskCheck): Promise<Array<T>> =>
     new Promise((resolve, reject) =>
         raw(tasks, 1, failFast, progressCallback, nextCheck)
             .then(result => {
@@ -121,11 +123,11 @@ export const sync = (tasks: (() => Promise<any>)[],
  * @param progressCallback optional function to be run to get status updates
  * @param nextCheck function which should return a promise, when resolved the next task will spawn
  */
-export const all = (tasks: (() => Promise<any>)[],
-                    maxInProgress = DEFAULT_MAX,
-                    failFast = true,
-                    progressCallback?: Function,
-                    nextCheck: (status: Result) => Promise<any> = defaultNextTaskCheck): Promise<Array<any>> =>
+export const all = <T>(tasks: (() => Promise<T>)[],
+                       maxInProgress = DEFAULT_MAX,
+                       failFast = true,
+                       progressCallback?: Function,
+                       nextCheck: (status: Result<T>) => Promise<any> = defaultNextTaskCheck): Promise<Array<T>> =>
     new Promise((resolve, reject) =>
         raw(tasks, maxInProgress, failFast, progressCallback, nextCheck)
             .then(result => {
