@@ -23,7 +23,7 @@ describe('Throttle test', function() {
         const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
         /* When */
-        const {tasks: formattedNames} = await Throttle.raw(tasks);
+        const {taskResults: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
         expect(formattedNames).to.not.be.empty;
@@ -50,7 +50,7 @@ describe('Throttle test', function() {
         const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
         /* When */
-        const {tasks: formattedNames} = await Throttle.raw(tasks);
+        const {taskResults: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
         expect(formattedNames).to.not.be.empty;
@@ -82,7 +82,7 @@ describe('Throttle test', function() {
         const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
         /* When */
-        const {tasks: formattedNames} = await Throttle.raw(tasks);
+        const {taskResults: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
         expect(formattedNames).to.not.be.empty;
@@ -111,7 +111,7 @@ describe('Throttle test', function() {
         const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
         /* When */
-        const {tasks: formattedNames} = await Throttle.raw(tasks);
+        const {taskResults: formattedNames} = await Throttle.raw(tasks);
 
         /* Then */
         expect(formattedNames).to.not.be.empty;
@@ -139,9 +139,9 @@ describe('Throttle test', function() {
 
         /* When */
         try {
-            const {tasks: formattedNames} = await Throttle.raw(tasks, 1, true);
+            const {taskResults: formattedNames} = await Throttle.raw(tasks, 1, true);
         } catch (failed) {
-            expect(failed.tasks[0]).to.be.an.instanceof(Error);
+            expect(failed.taskResults[0]).to.be.an.instanceof(Error);
             return;
         }
 
