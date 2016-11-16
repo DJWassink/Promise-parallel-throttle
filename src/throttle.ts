@@ -7,14 +7,13 @@ export interface Result<T> {
     amountRejected: number,
     rejectedIndexes: number[],
     resolvedIndexes: number[],
-    tasks: T[],
-    work: (() => Promise<T>)[]
+    taskResults: T[]
 }
 
 /**
  * Raw throttle function, which can return extra meta data.
- * @param tasks array[] of tasks
- * @param maxInProgress integer with amount ot tasks parallel to be run
+ * @param tasks array[] of functions
+ * @param maxInProgress integer with the max amount of tasks to be run in parallel
  * @param failFast boolean if true, do fail-fast behaviour (see Promise.all() documentation)
  * @param progressCallback function which can be used to see the progress
  * @param nextCheck
@@ -24,7 +23,7 @@ export const raw = <T>(tasks: (() => Promise<T>)[],
                        maxInProgress = DEFAULT_MAX,
                        failFast = false,
                        progressCallback?: Function,
-                       nextCheck: (status: Result<T>) => Promise<any> = defaultNextTaskCheck): Promise<Result<T>> => {
+                       nextCheck: (status: Result<T>, tasks: (() => Promise<T>)[]) => Promise<any> = defaultNextTaskCheck): Promise<Result<T>> => {
     return new Promise((resolve, reject) => {
         let failedFast = false;
         const result: Result<T> = {
@@ -34,19 +33,18 @@ export const raw = <T>(tasks: (() => Promise<T>)[],
             amountRejected: 0,
             rejectedIndexes: [],
             resolvedIndexes: [],
-            tasks: [],
-            work: tasks.slice(0)
+            taskResults: []
         };
 
         const executeTask = (index) => {
-            result.work[index]()
+            tasks[index]()
                 .then(taskResult => {
-                    result.tasks[index] = taskResult;
+                    result.taskResults[index] = taskResult;
                     result.resolvedIndexes.push(index);
                     result.amountResolved++;
                     taskDone();
                 }, error => {
-                    result.tasks[index] = error;
+                    result.taskResults[index] = error;
                     result.rejectedIndexes.push(index);
                     result.amountRejected++;
                     if (failFast) {
@@ -58,18 +56,18 @@ export const raw = <T>(tasks: (() => Promise<T>)[],
         };
 
         const taskDone = () => {
-            //make sure no more tasks are spawned when we rejected
+            //make sure no more tasks are spawned when we failedFast
             if (failedFast) return;
 
             result.amountDone++;
             if (progressCallback) progressCallback(result);
-            if (result.amountDone == result.work.length)return resolve(result);
+            if (result.amountDone == tasks.length)return resolve(result);
             nextTask();
         };
 
         const nextTask = () => {
             //check if we can execute the next task
-            nextCheck(result)
+            nextCheck(result, tasks)
                 .then(resolve => {
                     //execute it
                     executeTask(result.amountStarted++);
@@ -77,7 +75,7 @@ export const raw = <T>(tasks: (() => Promise<T>)[],
                 });
         };
 
-        //spawn the first X tasks
+        //spawn the first X task
         for (let i = 0; i < maxInProgress; i++) {
             nextTask();
         }
@@ -89,11 +87,12 @@ export const raw = <T>(tasks: (() => Promise<T>)[],
  * This can be overwritten to write own checks for example checking the amount
  * of used ram and waiting till the ram is low enough for a next task.
  * @param status
+ * @param tasks
  * @returns {Promise}
  */
-const defaultNextTaskCheck = <T>(status: Result<T>) =>
+const defaultNextTaskCheck = <T>(status: Result<T>, tasks: (() => Promise<T>)[]) =>
     new Promise((resolve, reject) => {
-        if (status.amountStarted < status.work.length) return resolve();
+        if (status.amountStarted < tasks.length) return resolve();
         reject();
     });
 
@@ -107,11 +106,11 @@ const defaultNextTaskCheck = <T>(status: Result<T>) =>
 export const sync = <T>(tasks: (() => Promise<T>)[],
                         failFast = true,
                         progressCallback?: Function,
-                        nextCheck: (status: Result<T>) => Promise<any> = defaultNextTaskCheck): Promise<Array<T>> =>
+                        nextCheck: (status: Result<T>, tasks: (() => Promise<T>)[]) => Promise<any> = defaultNextTaskCheck): Promise<Array<T>> =>
     new Promise((resolve, reject) =>
         raw(tasks, 1, failFast, progressCallback, nextCheck)
             .then(result => {
-                resolve(result.tasks)
+                resolve(result.taskResults)
             }, reject)
     );
 
@@ -127,10 +126,10 @@ export const all = <T>(tasks: (() => Promise<T>)[],
                        maxInProgress = DEFAULT_MAX,
                        failFast = true,
                        progressCallback?: Function,
-                       nextCheck: (status: Result<T>) => Promise<any> = defaultNextTaskCheck): Promise<Array<T>> =>
+                       nextCheck: (status: Result<T>, tasks: (() => Promise<T>)[]) => Promise<any> = defaultNextTaskCheck): Promise<Array<T>> =>
     new Promise((resolve, reject) =>
         raw(tasks, maxInProgress, failFast, progressCallback, nextCheck)
             .then(result => {
-                resolve(result.tasks)
+                resolve(result.taskResults)
             }, reject)
     );
