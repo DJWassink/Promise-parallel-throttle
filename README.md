@@ -86,14 +86,18 @@ All the functions got a parameter which will use the passed function as a check 
 The default `nextCheck` look like this;
 ```js
 const defaultNextTaskCheck = (status, tasks) => 
-	new Promise((resolve, reject) => {
-		if (status.amountStarted < tasks.length) return resolve();
-		reject();
-	});
+    return new Promise((resolve, reject) => {
+        if (status.amountStarted < tasks.length) {
+            return resolve(true);
+        }
+        resolve(false);
+    });
 ```
 
 This function will get a status object as parameter which adheres to the object in [Result / Progress callback](#result--progress-callback) and the list of tasks.
 In the default we simply check if the amount of started exceeds the amount to be done, if not we are free to start a other task.
+
+If a custom implementation decides to reject the error is propagated and should be handled in the user it's code.
 
 This function can be useful to write your own scheduler based on, for example ram usage/cpu usage.
 Lets say the tasks you defined use a lot of ram and you don't want to exceed a certain amount.
