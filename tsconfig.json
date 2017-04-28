@@ -5,6 +5,7 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "target": "es5",
+    "lib": ["es5", "ES2015.Promise"],
     "strictNullChecks": true
   },
   "files": [

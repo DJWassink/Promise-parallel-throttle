@@ -23,7 +23,6 @@
     "@types/chai": "^3.4.34",
     "@types/mocha": "^2.2.32",
     "@types/node": "^6.0.46",
-    "@types/es6-promise": "^0.0.32",
     "chai": "^3.5.0",
     "mocha": "^3.1.2",
     "typescript": "^2.0.7"
