@@ -18,6 +18,7 @@
   "bugs": {
     "url": "https://github.com/DJWassink/Promise-parallel-throttle/issues"
   },
+  "types": "./build/throttle.d.ts",
   "homepage": "https://github.com/DJWassink/Promise-parallel-throttle#readme",
   "devDependencies": {
     "@types/chai": "^3.4.34",
