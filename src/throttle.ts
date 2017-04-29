@@ -122,10 +122,7 @@ export function raw<T>(tasks: Tasks<T>,
  */
 const defaultNextTaskCheck: nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
     return new Promise((resolve, reject) => {
-        if (status.amountStarted < tasks.length) {
-            return resolve(true);
-        }
-        resolve(false);
+        resolve(status.amountStarted < tasks.length);
     });
 };
 
@@ -144,7 +141,13 @@ export function sync<T>(tasks: Tasks<T>,
         raw(tasks, 1, failFast, progressCallback, nextCheck)
             .then((result: Result<T>) => {
                 resolve(result.taskResults);
-            }, reject);
+            }, (error: Error|Result<T>) => {
+                if (error instanceof Error) {
+                    reject(error);
+                } else {
+                    reject(error.taskResults[error.rejectedIndexes[0]]);
+                }
+            });
     });
 }
 
@@ -165,6 +168,12 @@ export function all<T>(tasks: Tasks<T>,
         raw(tasks, maxInProgress, failFast, progressCallback, nextCheck)
             .then((result: Result<T>) => {
                 resolve(result.taskResults);
-            }, reject);
+            }, (error: Error|Result<T>) => {
+                if (error instanceof Error) {
+                    reject(error);
+                } else {
+                    reject(error.taskResults[error.rejectedIndexes[0]]);
+                }
+            });
     });
 }

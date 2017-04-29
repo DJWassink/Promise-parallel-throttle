@@ -7,7 +7,7 @@
     "prepublish": "npm run build",
     "build": "yarn lint && rm -rf ./build && tsc && npm run declarations",
     "declarations": "tsc --declaration",
-    "test": "yarn lint && jest",
+    "test": "yarn lint && jest --coverage",
     "test:watch": "jest --watch",
     "lint": "tslint -p ./tsconfig.json",
     "lint:fix": "tslint -p ./tsconfig.json --fix"
