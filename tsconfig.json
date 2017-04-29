@@ -6,7 +6,7 @@
     "module": "commonjs",
     "target": "es5",
     "lib": ["es5", "ES2015.Promise"],
-    "strictNullChecks": true
+    "strict": true
   },
   "files": [
     "./src/throttle.ts"

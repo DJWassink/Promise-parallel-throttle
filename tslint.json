@@ -1,0 +1,49 @@
+{
+  "extends": "tslint:recommended",
+  "rulesDirectory": "node_modules/tslint-eslint-rules/dist/rules",
+  "rules": {
+    "curly": true,
+    "object-literal-sort-keys": false,
+    "member-ordering": false,
+    "ordered-imports": false,
+    "trailing-comma": false,
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "ter-indent": [
+      true,
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "variable-name": [
+      true,
+      "allow-leading-underscore",
+      "allow-pascal-case"
+    ],
+    "interface-name": false,
+    "triple-equals": true,
+    "comment-format": false,
+    "eofline": false,
+    "semicolon": [
+      true,
+      "always",
+      "ignore-bound-class-methods"
+    ],
+    "max-line-length": 120,
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double"
+    ],
+    "array-type": [
+      true,
+      "array-simple"
+    ],
+    "arrow-parens": false,
+    "only-arrow-functions": false,
+    "object-literal-shorthand": false
+  }
+}

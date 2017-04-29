@@ -5,9 +5,12 @@
   "main": "build/throttle.js",
   "scripts": {
     "prepublish": "npm run build",
-    "build": "rm -rf ./build && tsc && npm run declarations",
-    "test": "npm run build && mocha tests --recursive --harmony-async-await",
-    "declarations": "tsc --declaration"
+    "build": "yarn lint && rm -rf ./build && tsc && npm run declarations",
+    "declarations": "tsc --declaration",
+    "test": "yarn lint && jest",
+    "test:watch": "jest --watch",
+    "lint": "tslint -p ./tsconfig.json",
+    "lint:fix": "tslint -p ./tsconfig.json --fix"
   },
   "repository": {
     "type": "git",
@@ -20,13 +23,26 @@
   },
   "types": "./build/throttle.d.ts",
   "homepage": "https://github.com/DJWassink/Promise-parallel-throttle#readme",
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
+    "testRegex": "(/tests/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  },
   "devDependencies": {
-    "@types/chai": "^3.4.34",
-    "@types/mocha": "^2.2.32",
+    "@types/jest": "^19.2.2",
     "@types/node": "^6.0.46",
-    "chai": "^3.5.0",
-    "mocha": "^3.1.2",
-    "typescript": "^2.0.7"
+    "jest": "^19.0.2",
+    "ts-jest": "^19.0.14",
+    "tslint": "^5.1.0",
+    "tslint-eslint-rules": "^4.0.0",
+    "typescript": "^2.3.2"
   },
   "dependencies": {}
 }
