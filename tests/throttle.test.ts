@@ -144,7 +144,7 @@ describe('Throttle test', function () {
 
             /* When */
             try {
-                const {taskResults: formattedNames} = await Throttle.raw(tasks, 1, true);
+                const {taskResults: formattedNames} = await Throttle.raw(tasks, {maxInProgress: 1, failFast: true});
             } catch (failed) {
                 expect(failed.taskResults[0]).toBeInstanceOf(Error);
                 return;
@@ -229,8 +229,7 @@ describe('Throttle test', function () {
             };
 
             try {
-                const {taskResults: formattedNames} = await Throttle.raw(tasks, 2, false, () => {
-                }, nextCheck);
+                const {taskResults: formattedNames} = await Throttle.raw(tasks, {maxInProgress: 2, failFast: false, nextCheck});
             } catch (error) {
                 //got error, everything good
                 return;
@@ -268,6 +267,76 @@ describe('Throttle test', function () {
             }
 
             throw new Error('Expected an error, didn\'t get one');
+        });
+
+        it('should call the callback function every time a task is done', async function () {
+            /* Given */
+            const names = [
+                { firstName: "Irene",     lastName: "Pullman" },
+                { firstName: "Sean",      lastName: "Parr" },
+                { firstName: "Joe",       lastName: "Slater" },
+                { firstName: "Karen",     lastName: "Turner" },
+                { firstName: "Tim",       lastName: "Black" }
+            ];
+
+            const combineNames = (firstName, lastName) => {
+                return new Promise((resolve, reject) => {
+                    resolve(firstName + ' ' + lastName);
+                });
+            };
+
+            //Create a array of functions to be run
+            let tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
+
+            /* When */
+            const progressCallback = jest.fn();
+            const {taskResults: formattedNames} = await Throttle.raw(tasks, {progressCallback});
+
+            /* Then */
+            expect(progressCallback).toHaveBeenCalledTimes(5);
+        });
+
+        it('should eventually stop if the nextTaskCheck returns false', async function () {
+            /* Given */
+            const names = [
+                { firstName: "Irene",     lastName: "Pullman" },
+                { firstName: "Sean",      lastName: "Parr" },
+                { firstName: "Joe",       lastName: "Slater" },
+                { firstName: "Karen",     lastName: "Turner" },
+                { firstName: "Tim",       lastName: "Black" },
+                { firstName: "Irene",     lastName: "Pullman" },
+                { firstName: "Sean",      lastName: "Parr" },
+                { firstName: "Joe",       lastName: "Slater" },
+                { firstName: "Karen",     lastName: "Turner" },
+                { firstName: "Tim",       lastName: "Black" }
+            ];
+
+            const combineNames = (firstName, lastName) => {
+                return new Promise((resolve, reject) => {
+                    resolve(firstName + ' ' + lastName);
+                });
+            };
+
+            //Create a array of functions to be run
+            let tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
+
+            /* When */
+            let taskCounter = 0;
+            const nextCheck = (status) => {
+                return new Promise((resolve, reject) => {
+                    if (taskCounter++ >= 5) {
+                        return resolve(false);
+                    }
+                    resolve(true);
+                });
+            };
+
+            const result = await Throttle.raw(tasks, {maxInProgress: 2, failFast: false, nextCheck});
+
+            /* Then */
+            expect(result.taskResults).toHaveLength(5);
+            expect(result.amountDone).toEqual(10);
+            expect(result.amountStarted).toEqual(5);
         });
     });
 
@@ -418,7 +487,7 @@ describe('Throttle test', function () {
                 return;
             }
 
-            throw Error('expected error tho throw');
+            throw Error('expected error to throw');
         });
 
         it('should throw if one task isn\'t a function', async function () {

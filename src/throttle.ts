@@ -10,25 +10,51 @@ export interface Result<T> {
     taskResults: T[];
 }
 
+export interface Options {
+    maxInProgress?: number;
+    failFast?: boolean;
+    progressCallback?: <T>(result: Result<T>) => void;
+    nextCheck?: nextTaskCheck;
+}
+
+/**
+ * Default checker which validates if a next task should begin.
+ * This can be overwritten to write own checks for example checking the amount
+ * of used ram and waiting till the ram is low enough for a next task.
+ *
+ * It should always resolve with a boolean, either `true` to start a next task
+ * or `false` to stop executing a new task.
+ *
+ * If this method rejects, the error will propagate to the caller
+ * @param status
+ * @param tasks
+ * @returns {Promise}
+ */
+const defaultNextTaskCheck: nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+        resolve(status.amountStarted < tasks.length);
+    });
+};
+
+const DEFAULT_OPTIONS = {
+    maxInProgress: DEFAULT_MAX,
+    failFast: false,
+    nextCheck: defaultNextTaskCheck,
+};
+
 export type Task<T> = () => Promise<T>;
 export type Tasks<T> = Array<Task<T>>;
 export type nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>) => Promise<boolean>;
 
 /**
  * Raw throttle function, which can return extra meta data.
- * @param tasks array[] of functions
- * @param maxInProgress integer with the max amount of tasks to be run in parallel
- * @param failFast boolean if true, do fail-fast behaviour (see Promise.all() documentation)
- * @param progressCallback function which can be used to see the progress
- * @param nextCheck
+ * @param tasks required array of tasks to be executed
+ * @param options Options object
  * @returns {Promise}
  */
-export function raw<T>(tasks: Tasks<T>,
-                       maxInProgress = DEFAULT_MAX,
-                       failFast = false,
-                       progressCallback?: (result: Result<T>) => void,
-                       nextCheck = defaultNextTaskCheck): Promise<Result<T>> {
+export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
     return new Promise((resolve, reject) => {
+        const myOptions = Object.assign({}, DEFAULT_OPTIONS, options);
         const result: Result<T> = {
             amountDone: 0,
             amountStarted: 0,
@@ -57,7 +83,7 @@ export function raw<T>(tasks: Tasks<T>,
                         result.taskResults[index] = error;
                         result.rejectedIndexes.push(index);
                         result.amountRejected++;
-                        if (failFast) {
+                        if (myOptions.failFast === true) {
                             failedFast = true;
                             return reject(result);
                         }
@@ -71,13 +97,13 @@ export function raw<T>(tasks: Tasks<T>,
 
         const taskDone = () => {
             //make sure no more tasks are spawned when we failedFast
-            if (failedFast) {
+            if (failedFast === true) {
                 return;
             }
 
             result.amountDone++;
-            if (progressCallback) {
-                progressCallback(result);
+            if (typeof (myOptions as Options).progressCallback === 'function') {
+                (myOptions as any).progressCallback(result);
             }
             if (result.amountDone === tasks.length) {
                 return resolve(result);
@@ -90,17 +116,19 @@ export function raw<T>(tasks: Tasks<T>,
 
         const nextTask = () => {
             //check if we can execute the next task
-            nextCheck(result, tasks)
+            myOptions.nextCheck(result, tasks)
                 .then(canExecuteNextTask => {
                     if (canExecuteNextTask === true) {
                         //execute it
                         executeTask(result.amountStarted++);
+                    } else {
+                        taskDone();
                     }
                 }, reject);
         };
 
         //spawn the first X task
-        for (let i = 0; i < Math.min(maxInProgress, tasks.length); i++) {
+        for (let i = 0; i < Math.min(myOptions.maxInProgress, tasks.length); i++) {
             amountQueued++;
             nextTask();
         }
@@ -108,37 +136,15 @@ export function raw<T>(tasks: Tasks<T>,
 }
 
 /**
- * Default checker which validates if a next task should begin.
- * This can be overwritten to write own checks for example checking the amount
- * of used ram and waiting till the ram is low enough for a next task.
- *
- * It should always resolve with a boolean, either `true` to start a next task
- * or `false` to stop executing a new task.
- *
- * If this method rejects, the error will propagate to the caller
- * @param status
- * @param tasks
- * @returns {Promise}
- */
-const defaultNextTaskCheck: nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-        resolve(status.amountStarted < tasks.length);
-    });
-};
-
-/**
  * Simply run all the promises after each other, so in synchronous manner
  * @param tasks required array of tasks to be executed
- * @param failFast optional boolean if we directly reject on a single error defaults to true
- * @param progressCallback optional function to be run to get status updates
- * @param nextCheck function which should return a promise, when resolved the next task will spawn
+ * @param options Options object
+ * @returns {Promise}
  */
-export function sync<T>(tasks: Tasks<T>,
-                        failFast = true,
-                        progressCallback?: () => void,
-                        nextCheck = defaultNextTaskCheck): Promise<T[]> {
+export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     return new Promise((resolve, reject) => {
-        raw(tasks, 1, failFast, progressCallback, nextCheck)
+        const myOptions = Object.assign({}, options, {maxInProgress: 1, failFast: true});
+        raw(tasks, myOptions)
             .then((result: Result<T>) => {
                 resolve(result.taskResults);
             }, (error: Error|Result<T>) => {
@@ -154,18 +160,13 @@ export function sync<T>(tasks: Tasks<T>,
 /**
  * Exposes the same behaviour as Promise.All(), but throttled!
  * @param tasks required array of tasks to be executed
- * @param maxInProgress optional integer max amount of parallel tasks to be run defaults to 5
- * @param failFast optional boolean if we directly reject on a single error defaults to true
- * @param progressCallback optional function to be run to get status updates
- * @param nextCheck function which should return a promise, when resolved the next task will spawn
+ * @param options Options object
+ * @returns {Promise}
  */
-export function all<T>(tasks: Tasks<T>,
-                       maxInProgress = DEFAULT_MAX,
-                       failFast = true,
-                       progressCallback?: () => void,
-                       nextCheck = defaultNextTaskCheck): Promise<T[]> {
+export function all<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     return new Promise((resolve, reject) => {
-        raw(tasks, maxInProgress, failFast, progressCallback, nextCheck)
+        const myOptions = Object.assign({}, options, {failFast: true});
+        raw(tasks, myOptions)
             .then((result: Result<T>) => {
                 resolve(result.taskResults);
             }, (error: Error|Result<T>) => {
