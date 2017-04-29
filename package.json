@@ -1,13 +1,13 @@
 {
   "name": "promise-parallel-throttle",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "description": "Run promises in parallel, but throttled",
   "main": "build/throttle.js",
   "scripts": {
     "prepublish": "npm run build",
     "build": "yarn lint && rm -rf ./build && tsc && npm run declarations",
     "declarations": "tsc --declaration",
-    "test": "yarn lint && jest",
+    "test": "yarn lint && jest --coverage",
     "test:watch": "jest --watch",
     "lint": "tslint -p ./tsconfig.json",
     "lint:fix": "tslint -p ./tsconfig.json --fix"
