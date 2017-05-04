@@ -44,20 +44,21 @@ console.log(formattedNames); //['Irene Pullman', 'Sean Parr']
 ### Throttle.all
 `Throttle.all(tasks, options)`
 
-Throttle.all is made to behave exactly like Promise.all but instead of all the tasks run parallel it runs a max amount of tasks parallel.
-All the tasks array parameter is required while the [options](#option-s-object) parameter is optional.
+Throttle.all is made to behave exactly like Promise.all but instead of all the tasks running in parallel it runs a maxium amount of tasks parallel.
+Only the tasks array parameter is required while the [options](#options-object) parameter is optional.
 
 ### Throttle.sync
 `Throttle.sync(tasks, options)`
 
 Throttle.sync runs all the tasks synchronously. 
-Once again the tasks array is required, the options are optional.
+Once again the tasks array is required, the [options](#options-object) are optional. 
+Be aware that this method is simply a wrapper to pass `maxInProgress` with 1. So overwriting this option in the options object would run the tasks again in parallel.
 
 ### Throttle.raw
 `Throttle.raw(tasks, options)`
  
- The raw method instead of returning the tasks their results will return a [Result](#result-object--progress-callback) object. 
- Useful if you wan't more statistics about the execution of your tasks.
+ The raw method instead of returning the tasks their results, will return a [result](#result-object--progress-callback) object. 
+ Useful if you wan't more statistics about the execution of your tasks. Once again the tasks are required while the [options](#options-object) are optional.
 
 #### Option's Object
 |Parameter|Type|Default|Definition|
@@ -65,7 +66,7 @@ Once again the tasks array is required, the options are optional.
 |maxInProgress |Integer|5| max amount of parallel threads|
 |failFast |Boolean|false| reject after a single error, or keep running|
 |progressCallback |Function|Optional| callback with progress reports|
-|nextCheck |Function|Optional| function which should return a promise, if the promise resolved true the next task is spawn|
+|nextCheck |Function|Optional| function which should return a promise, if the promise resolved true the next task is spawn, errors will propagate and should be handled in the calling code|
 
 #### Result object / Progress callback
 The `progressCallback` and the `Raw` will return a `Result` object with the following properties:
@@ -92,7 +93,7 @@ const defaultNextTaskCheck = (status, tasks) => {
 }
 ```
 
-This function will get a status object as parameter which adheres to the object in [Result object / Progress callback](#result-object--progress-callback) and also it receives the list of tasks.
+This function will get a status object as parameter which adheres to the object in [Result object](#result-object--progress-callback) and also it receives the list of tasks.
 In the default `nextCheck` we simply check if the amount of started exceeds the amount to be done, if not we are free to start an other task.
 
 This function can be useful to write your own scheduler based on, for example ram usage/cpu usage.
