@@ -1,5 +1,5 @@
 {
-  "name": "fitted-example",
+  "name": "promise-parallel-throttle-example",
   "scripts": {
     "names": "node --harmony-async-await ./names.js"
   }

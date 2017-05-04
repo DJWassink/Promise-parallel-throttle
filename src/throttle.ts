@@ -143,7 +143,7 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
  */
 export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     return new Promise((resolve, reject) => {
-        const myOptions = Object.assign({}, options, {maxInProgress: 1, failFast: true});
+        const myOptions = Object.assign({}, {maxInProgress: 1, failFast: true}, options);
         raw(tasks, myOptions)
             .then((result: Result<T>) => {
                 resolve(result.taskResults);
@@ -165,7 +165,7 @@ export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
  */
 export function all<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     return new Promise((resolve, reject) => {
-        const myOptions = Object.assign({}, options, {failFast: true});
+        const myOptions = Object.assign({}, {failFast: true}, options);
         raw(tasks, myOptions)
             .then((result: Result<T>) => {
                 resolve(result.taskResults);
