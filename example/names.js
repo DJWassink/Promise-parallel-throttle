@@ -26,8 +26,8 @@ const names = [
 const slowCombineNames = (firstName, lastName) => {
     return new Promise((resolve, reject) => {
         //Recommended is to return a Error object if we received a error. This is easy to check later on.
-        if (firstName == "Ruth") reject(new Error('argh!'));
-        //Do some async stuff here. For now we similate it through a timeout.
+        if (firstName === "Ruth") reject(new Error('argh!'));
+        //Do some async stuff here. For now we simulate it through a timeout.
         setTimeout(
             () => resolve(firstName + " " + lastName),
             (Math.random() * (1000 - 500) + 500)
@@ -39,8 +39,15 @@ const slowCombineNames = (firstName, lastName) => {
     //Create a array of functions to be run
     const tasks = names.map(u => () => slowCombineNames(u.firstName, u.lastName));
 
+    //Create a (optional) Options object
+    const options = {
+        maxInProgress: 3,
+        failFast: false,
+        progressCallback: statusUpdate => console.log(statusUpdate)
+    };
+
     //Execute the throttle task, only the array of tasks is required, other params are optional.
-    const formattedNames = await Throttle.all(tasks, 3, false, statusUpdate => console.log(statusUpdate));
+    const formattedNames = await Throttle.all(tasks, options);
 
     //Loop through the result and print the result.
     formattedNames.forEach((result, index) => {

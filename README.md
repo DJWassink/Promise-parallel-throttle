@@ -42,67 +42,64 @@ console.log(formattedNames); //['Irene Pullman', 'Sean Parr']
 
 ## API
 ### Throttle.all
-`Throttle.all(tasks, maxInProgress = DEFAULT_MAX, failFast = true, progressCallback, nextCheck = defaultNextTaskCheck)`
+`Throttle.all(tasks, options)`
 
 Throttle.all is made to behave exactly like Promise.all but instead of all the tasks run parallel it runs a max amount of tasks parallel.
-All the parameters are optional instead of tasks array which is required.
-For the defenition of the other parameters see [Throttle.raw](#Throttle.raw)
+All the tasks array parameter is required while the [options](#option-s-object) parameter is optional.
 
 ### Throttle.sync
-`Throttle.sync(tasks, failFast = true, progressCallback, nextCheck = defaultNextTaskCheck)`
+`Throttle.sync(tasks, options)`
 
-Throttle.sync runs all the tasks synchronously. All the parameters are optional except for the tasks array.
-For the defenition of the other parameters see [Throttle.raw](#Throttle.raw)
+Throttle.sync runs all the tasks synchronously. 
+Once again the tasks array is required, the options are optional.
 
 ### Throttle.raw
-#### Options (parameters)
-`Throttle.raw` requires only a array of functions to work properly. However there are more parameters.
+`Throttle.raw(tasks, options)`
+ 
+ The raw method instead of returning the tasks their results will return a [Result](#result-object--progress-callback) object. 
+ Useful if you wan't more statistics about the execution of your tasks.
 
-`Throttle.raw(tasks, maxInProgress = DEFAULT_MAX, failFast = false, progressCallback, nextCheck = defaultNextTaskCheck)`
-
+#### Option's Object
 |Parameter|Type|Default|Definition|
 |:---|:---|:---|:---|
-|tasks|Array|Required|queue of tasks to be run|
 |maxInProgress |Integer|5| max amount of parallel threads|
 |failFast |Boolean|false| reject after a single error, or keep running|
 |progressCallback |Function|Optional| callback with progress reports|
-|nextCheck |Function|Optional| function which should return a promise, if the promise resolved next task is spawn|
+|nextCheck |Function|Optional| function which should return a promise, if the promise resolved true the next task is spawn|
 
-#### Result / Progress callback
-The progressCallback and the Throttle itself will return a object with the following properties:
+#### Result object / Progress callback
+The `progressCallback` and the `Raw` will return a `Result` object with the following properties:
 
 |Property|Type|Start value|Definition|
 |:---|:---|:---|:---|
 |amountDone|Integer|0|amount of tasks which are finished|
 |amountStarted|Integer|0|amount of tasks which started|
 |amountResolved|Integer|0|amount of tasks which successfully resolved|
-|amountRejected|Integer|0|amount of tasks which errored and are aborted|
+|amountRejected|Integer|0|amount of tasks which returned in an error and are aborted|
 |rejectedIndexes|Array|[]|all the indexes in the tasks array where the promise rejected|
 |resolvedIndexes|Array|[]|all the indexes in the tasks array where the promise resolved|
 |taskResults|Array|[]|array containing the result of every task|
 
 #### nextCheck
-All the functions got a parameter which will use the passed function as a check before spawning the next task.
+All the methods have a `nextCheck` method which will be used to verify if a next task is allowed to start. 
+
 The default `nextCheck` look like this;
 ```js
-const defaultNextTaskCheck = (status, tasks) => 
+const defaultNextTaskCheck = (status, tasks) => {
     return new Promise((resolve, reject) => {
-        if (status.amountStarted < tasks.length) {
-            return resolve(true);
-        }
-        resolve(false);
+        resolve(status.amountStarted < tasks.length);
     });
+}
 ```
 
-This function will get a status object as parameter which adheres to the object in [Result / Progress callback](#result--progress-callback) and the list of tasks.
-In the default we simply check if the amount of started exceeds the amount to be done, if not we are free to start a other task.
-
-If a custom implementation decides to reject the error is propagated and should be handled in the user it's code.
+This function will get a status object as parameter which adheres to the object in [Result object / Progress callback](#result-object--progress-callback) and also it receives the list of tasks.
+In the default `nextCheck` we simply check if the amount of started exceeds the amount to be done, if not we are free to start an other task.
 
 This function can be useful to write your own scheduler based on, for example ram usage/cpu usage.
 Lets say the tasks you defined use a lot of ram and you don't want to exceed a certain amount.
 Then you could write logic inside a `nextCheck` function which resolves after there is enough ram available to start the next task.
 
+If a custom implementation decides to reject the error is propagated and should be handled in the user it's code.
 
 ## Example
 Check out the example's directory, it's heavily documented so it should be easy to follow.
