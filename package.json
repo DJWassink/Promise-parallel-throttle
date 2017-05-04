@@ -1,6 +1,6 @@
 {
   "name": "promise-parallel-throttle",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "Run promises in parallel, but throttled",
   "main": "build/throttle.js",
   "scripts": {
