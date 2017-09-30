@@ -1,48 +1,60 @@
 {
-  "name": "promise-parallel-throttle",
-  "version": "3.0.0",
-  "description": "Run promises in parallel, but throttled",
-  "main": "build/throttle.js",
-  "scripts": {
-    "prepublish": "npm run build",
-    "build": "yarn lint && rm -rf ./build && tsc && npm run declarations",
-    "declarations": "tsc --declaration",
-    "test": "yarn lint && jest --coverage --no-cache",
-    "test:watch": "jest --watch",
-    "lint": "tslint -p ./tsconfig.json",
-    "lint:fix": "tslint -p ./tsconfig.json --fix"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DJWassink/Promise-parallel-throttle.git"
-  },
-  "author": "\"Dirk-Jan Wassink <dirk.jan.wassink@gmail.com> (http://dirkjanwassink.nl)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/DJWassink/Promise-parallel-throttle/issues"
-  },
-  "types": "./build/throttle.d.ts",
-  "homepage": "https://github.com/DJWassink/Promise-parallel-throttle#readme",
-  "jest": {
-    "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    "name": "promise-parallel-throttle",
+    "version": "3.0.0",
+    "description": "Run promises in parallel, but throttled",
+    "main": "build/throttle.js",
+    "scripts": {
+        "precommit": "lint-staged",
+        "prepublish": "npm run build",
+        "build": "yarn lint && rm -rf ./build && tsc && npm run declarations",
+        "declarations": "tsc --declaration",
+        "test": "yarn lint && jest --coverage --no-cache",
+        "test:watch": "jest --watch",
+        "lint": "tslint -p ./tsconfig.json",
+        "lint:fix": "tslint -p ./tsconfig.json --fix",
+        "prettier": "prettier --write \"src/**/*.ts*\""
     },
-    "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
-    "testRegex": "(/tests/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ]
-  },
-  "devDependencies": {
-    "@types/jest": "^19.2.2",
-    "@types/node": "^6.0.46",
-    "jest": "^19.0.2",
-    "ts-jest": "^19.0.14",
-    "tslint": "^5.1.0",
-    "tslint-eslint-rules": "^4.0.0",
-    "typescript": "^2.3.2"
-  },
-  "dependencies": {}
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DJWassink/Promise-parallel-throttle.git"
+    },
+    "author": "Dirk-Jan Wassink <dirk.jan.wassink@gmail.com> (http://dirkjanwassink.nl)",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/DJWassink/Promise-parallel-throttle/issues"
+    },
+    "types": "./build/throttle.d.ts",
+    "homepage": "https://github.com/DJWassink/Promise-parallel-throttle#readme",
+    "jest": {
+        "transform": {
+            ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+        },
+        "testResultsProcessor": "<rootDir>/node_modules/ts-jest/coverageprocessor.js",
+        "testRegex": "(/tests/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+        "moduleFileExtensions": ["ts", "tsx", "js"]
+    },
+    "lint-staged": {
+        "*.{ts,js}": ["prettier --write", "tslint -c ./tslint.json", "git add"]
+    },
+    "prettier": {
+        "printWidth": 120,
+        "tabWidth": 4,
+        "singleQuote": true,
+        "jsxBracketSameLine": true,
+        "bracketSpacing": true
+    },
+    "devDependencies": {
+        "@types/jest": "^19.2.2",
+        "@types/node": "^6.0.46",
+        "husky": "^0.14.3",
+        "jest": "^19.0.2",
+        "lint-staged": "^4.2.3",
+        "prettier": "^1.7.2",
+        "ts-jest": "^19.0.14",
+        "tslint": "^5.1.0",
+        "tslint-config-prettier": "^1.5.0",
+        "tslint-eslint-rules": "^4.1.1",
+        "typescript": "^2.3.2"
+    },
+    "dependencies": {}
 }

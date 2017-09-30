@@ -39,7 +39,7 @@ const defaultNextTaskCheck: nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<
 const DEFAULT_OPTIONS = {
     maxInProgress: DEFAULT_MAX,
     failFast: false,
-    nextCheck: defaultNextTaskCheck,
+    nextCheck: defaultNextTaskCheck
 };
 
 export type Task<T> = () => Promise<T>;
@@ -73,13 +73,14 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
         let amountQueued = 0;
         const executeTask = (index: number) => {
             if (typeof tasks[index] === 'function') {
-                tasks[index]()
-                    .then((taskResult: T) => {
+                tasks[index]().then(
+                    (taskResult: T) => {
                         result.taskResults[index] = taskResult;
                         result.resolvedIndexes.push(index);
                         result.amountResolved++;
                         taskDone();
-                    }, error => {
+                    },
+                    error => {
                         result.taskResults[index] = error;
                         result.rejectedIndexes.push(index);
                         result.amountRejected++;
@@ -88,10 +89,13 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
                             return reject(result);
                         }
                         taskDone();
-                    });
+                    }
+                );
             } else {
                 failedFast = true;
-                return reject(new Error('tasks[' + index + ']: ' + tasks[index] + ', is supposed to be of type function'));
+                return reject(
+                    new Error('tasks[' + index + ']: ' + tasks[index] + ', is supposed to be of type function')
+                );
             }
         };
 
@@ -116,15 +120,14 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
 
         const nextTask = () => {
             //check if we can execute the next task
-            myOptions.nextCheck(result, tasks)
-                .then(canExecuteNextTask => {
-                    if (canExecuteNextTask === true) {
-                        //execute it
-                        executeTask(result.amountStarted++);
-                    } else {
-                        taskDone();
-                    }
-                }, reject);
+            myOptions.nextCheck(result, tasks).then(canExecuteNextTask => {
+                if (canExecuteNextTask === true) {
+                    //execute it
+                    executeTask(result.amountStarted++);
+                } else {
+                    taskDone();
+                }
+            }, reject);
         };
 
         //spawn the first X task
@@ -143,17 +146,19 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
  */
 export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     return new Promise((resolve, reject) => {
-        const myOptions = Object.assign({}, {maxInProgress: 1, failFast: true}, options);
-        raw(tasks, myOptions)
-            .then((result: Result<T>) => {
+        const myOptions = Object.assign({}, { maxInProgress: 1, failFast: true }, options);
+        raw(tasks, myOptions).then(
+            (result: Result<T>) => {
                 resolve(result.taskResults);
-            }, (error: Error|Result<T>) => {
+            },
+            (error: Error | Result<T>) => {
                 if (error instanceof Error) {
                     reject(error);
                 } else {
                     reject(error.taskResults[error.rejectedIndexes[0]]);
                 }
-            });
+            }
+        );
     });
 }
 
@@ -165,16 +170,18 @@ export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
  */
 export function all<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     return new Promise((resolve, reject) => {
-        const myOptions = Object.assign({}, {failFast: true}, options);
-        raw(tasks, myOptions)
-            .then((result: Result<T>) => {
+        const myOptions = Object.assign({}, { failFast: true }, options);
+        raw(tasks, myOptions).then(
+            (result: Result<T>) => {
                 resolve(result.taskResults);
-            }, (error: Error|Result<T>) => {
+            },
+            (error: Error | Result<T>) => {
                 if (error instanceof Error) {
                     reject(error);
                 } else {
                     reject(error.taskResults[error.rejectedIndexes[0]]);
                 }
-            });
+            }
+        );
     });
 }
