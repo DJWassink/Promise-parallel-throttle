@@ -64,7 +64,7 @@ Be aware that this method is simply a wrapper to pass `maxInProgress` with 1. So
 |Parameter|Type|Default|Definition|
 |:---|:---|:---|:---|
 |maxInProgress |Integer|5| max amount of parallel threads|
-|failFast |Boolean|false| reject after a single error, or keep running|
+|failFast |Boolean|true (false for `raw` method)| reject after a single error, or keep running|
 |progressCallback |Function|Optional| callback with progress reports|
 |nextCheck |Function|Optional| function which should return a promise, if the promise resolved true the next task is spawn, errors will propagate and should be handled in the calling code|
 
