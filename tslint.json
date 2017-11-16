@@ -14,6 +14,7 @@
         "array-type": [true, "array-simple"],
         "arrow-parens": false,
         "only-arrow-functions": false,
-        "object-literal-shorthand": false
+        "object-literal-shorthand": false,
+        "no-console": [true, "log"]
     }
 }

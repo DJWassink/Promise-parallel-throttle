@@ -1,6 +1,6 @@
 {
-  "name": "promise-parallel-throttle-example",
-  "scripts": {
-    "names": "node --harmony-async-await ./names.js"
-  }
+    "name": "promise-parallel-throttle-example",
+    "scripts": {
+        "names": "node ./names.js"
+    }
 }

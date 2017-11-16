@@ -316,10 +316,9 @@ describe('Throttle test', function() {
             const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
             /* When */
-            let taskCounter = 0;
             const nextCheck = status => {
                 return new Promise<boolean>((resolve, reject) => {
-                    if (taskCounter++ >= 5) {
+                    if (status.amountStarted >= 6) {
                         return resolve(false);
                     }
                     resolve(true);
@@ -329,9 +328,10 @@ describe('Throttle test', function() {
             const result = await Throttle.raw(tasks, { maxInProgress: 2, failFast: false, nextCheck });
 
             /* Then */
-            expect(result.taskResults).toHaveLength(5);
+            expect(result.taskResults).toHaveLength(6);
             expect(result.amountDone).toEqual(10);
-            expect(result.amountStarted).toEqual(5);
+            expect(result.nextCheckFalseyIndexes).toHaveLength(4);
+            expect(result.amountStarted).toEqual(6);
         });
     });
 
