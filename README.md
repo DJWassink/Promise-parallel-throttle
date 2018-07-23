@@ -22,7 +22,7 @@ yarn add promise-parallel-throttle
 ## Usage
 
 ```js
-import Throttle from 'promise-parallel-throttle';
+import * as Throttle from 'promise-parallel-throttle';
 
 //Function which should return a Promise
 const doReq = async (firstName, lastName) => {
@@ -43,6 +43,7 @@ const formattedNames = await Throttle.all(queue);
 
 console.log(formattedNames); //['Irene Pullman', 'Sean Parr']
 ```
+[![Edit Promise-parallel-throttle example](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/4x1943m2v7)
 
 ## API
 ### Throttle.all
