@@ -3,7 +3,6 @@
     "rulesDirectory": "node_modules/tslint-eslint-rules/dist/rules",
     "rules": {
         "object-literal-sort-keys": false,
-        "ordered-imports": false,
         "member-ordering": false,
         "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
         "interface-name": false,
@@ -15,6 +14,21 @@
         "arrow-parens": false,
         "only-arrow-functions": false,
         "object-literal-shorthand": false,
-        "no-console": [true, "log"]
+        "no-var-requires": false,
+        "no-misused-new": false,
+        "prefer-for-of": true,
+        "promise-function-async": true,
+        "await-promise": true,
+        "no-floating-promises": true,
+        "no-console": [true, "log", "error"],
+        "ordered-imports": [
+            true,
+            {
+                "import-sources-order": "case-insensitive",
+                "grouped-imports": true,
+                "named-imports-order": "case-insensitive",
+                "module-source-path": "basename"
+            }
+        ]
     }
 }
