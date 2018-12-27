@@ -12,11 +12,11 @@ export interface Result<T> {
     taskResults: T[];
 }
 
-export interface Options {
+export interface Options<T> {
     maxInProgress?: number;
     failFast?: boolean;
-    progressCallback?: <T>(result: Result<T>) => void;
-    nextCheck?: nextTaskCheck;
+    progressCallback?: (result: Result<T>) => void;
+    nextCheck?: nextTaskCheck<T>;
     ignoreIsFunctionCheck?: boolean;
 }
 
@@ -33,7 +33,7 @@ export interface Options {
  * @param tasks
  * @returns {Promise}
  */
-const defaultNextTaskCheck: nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
+const defaultNextTaskCheck: nextTaskCheck<unknown> = <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
     return Promise.resolve(status.amountStarted < tasks.length);
 };
 
@@ -46,7 +46,7 @@ const DEFAULT_OPTIONS = {
 
 export type Task<T> = () => Promise<T>;
 export type Tasks<T> = Array<Task<T>>;
-export type nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>) => Promise<boolean>;
+export type nextTaskCheck<T> = (status: Result<T>, tasks: Tasks<T>) => Promise<boolean>;
 
 /**
  * Raw throttle function, which can return extra meta data.
@@ -54,7 +54,7 @@ export type nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>) => Promise<b
  * @param options Options object
  * @returns {Promise}
  */
-export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
+export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>> {
     return new Promise<Result<T>>((resolve, reject) => {
         const myOptions = Object.assign({}, DEFAULT_OPTIONS, options);
         const result: Result<T> = {
@@ -117,7 +117,7 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
             }
 
             result.amountDone++;
-            if (typeof (myOptions as Options).progressCallback === 'function') {
+            if (typeof (myOptions as Options<T>).progressCallback === 'function') {
                 (myOptions as any).progressCallback(result);
             }
             if (result.amountDone === tasks.length) {
@@ -155,7 +155,7 @@ export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
  * @param options
  * @returns {Promise}
  */
-function executeRaw<T>(tasks: Tasks<T>, options: Options): Promise<T[]> {
+function executeRaw<T>(tasks: Tasks<T>, options: Options<T>): Promise<T[]> {
     return new Promise<T[]>((resolve, reject) => {
         raw(tasks, options).then(
             (result: Result<T>) => {
@@ -178,7 +178,7 @@ function executeRaw<T>(tasks: Tasks<T>, options: Options): Promise<T[]> {
  * @param options Options object
  * @returns {Promise}
  */
-export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
+export function sync<T>(tasks: Tasks<T>, options?: Options<T>): Promise<T[]> {
     const myOptions = Object.assign({}, {maxInProgress: 1, failFast: true}, options);
     return executeRaw(tasks, myOptions);
 }
@@ -189,7 +189,7 @@ export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
  * @param options Options object
  * @returns {Promise}
  */
-export function all<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
+export function all<T>(tasks: Tasks<T>, options?: Options<T>): Promise<T[]> {
     const myOptions = Object.assign({}, {failFast: true}, options);
     return executeRaw(tasks, myOptions);
 }
