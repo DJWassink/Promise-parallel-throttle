@@ -33,7 +33,7 @@ export interface Options {
  * @param tasks
  * @returns {Promise}
  */
-const defaultNextTaskCheck: nextTaskCheck = async <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
+const defaultNextTaskCheck: nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>): Promise<boolean> => {
     return Promise.resolve(status.amountStarted < tasks.length);
 };
 
@@ -54,7 +54,7 @@ export type nextTaskCheck = <T>(status: Result<T>, tasks: Tasks<T>) => Promise<b
  * @param options Options object
  * @returns {Promise}
  */
-export async function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
+export function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result<T>> {
     return new Promise<Result<T>>((resolve, reject) => {
         const myOptions = Object.assign({}, DEFAULT_OPTIONS, options);
         const result: Result<T> = {
@@ -155,7 +155,7 @@ export async function raw<T>(tasks: Tasks<T>, options?: Options): Promise<Result
  * @param options
  * @returns {Promise}
  */
-async function executeRaw<T>(tasks: Tasks<T>, options: Options): Promise<T[]> {
+function executeRaw<T>(tasks: Tasks<T>, options: Options): Promise<T[]> {
     return new Promise<T[]>((resolve, reject) => {
         raw(tasks, options).then(
             (result: Result<T>) => {
@@ -178,7 +178,7 @@ async function executeRaw<T>(tasks: Tasks<T>, options: Options): Promise<T[]> {
  * @param options Options object
  * @returns {Promise}
  */
-export async function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
+export function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     const myOptions = Object.assign({}, {maxInProgress: 1, failFast: true}, options);
     return executeRaw(tasks, myOptions);
 }
@@ -189,7 +189,7 @@ export async function sync<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> 
  * @param options Options object
  * @returns {Promise}
  */
-export async function all<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
+export function all<T>(tasks: Tasks<T>, options?: Options): Promise<T[]> {
     const myOptions = Object.assign({}, {failFast: true}, options);
     return executeRaw(tasks, myOptions);
 }
