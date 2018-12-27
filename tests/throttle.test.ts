@@ -1,10 +1,16 @@
 import * as Throttle from '../src/throttle';
+import {Result} from '../src/throttle';
+
+interface Person {
+    firstName: string;
+    lastName: string;
+}
 
 describe('Throttle test', function() {
     describe('raw', function() {
         it('should return the same amount of tasks', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -17,7 +23,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -35,14 +41,14 @@ describe('Throttle test', function() {
 
         it('should return in the same order', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
                 {firstName: 'Karen', lastName: 'Turner'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -63,7 +69,7 @@ describe('Throttle test', function() {
 
         it('should return in the same order with delayed tasks', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -71,7 +77,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     setTimeout(() => resolve(firstName + ' ' + lastName), Math.random() * (1000 - 500) + 500);
                 });
@@ -92,7 +98,7 @@ describe('Throttle test', function() {
 
         it('should continue when a error occurred', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -100,7 +106,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     reject(new Error());
                 });
@@ -119,7 +125,7 @@ describe('Throttle test', function() {
 
         it('should abort on the first error occurred', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -127,7 +133,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     reject(new Error());
                 });
@@ -150,9 +156,9 @@ describe('Throttle test', function() {
 
         it('should resolve immediately on a empty task array', async function() {
             /* Given */
-            const names = [];
+            const names: Person[] = [];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -171,9 +177,9 @@ describe('Throttle test', function() {
 
         it('should gracefully handle the tasks even if maxInProgress is higher then the amount of tasks', async function() {
             /* Given */
-            const names = [{firstName: 'Irene', lastName: 'Pullman'}, {firstName: 'Sean', lastName: 'Parr'}];
+            const names: Person[] = [{firstName: 'Irene', lastName: 'Pullman'}, {firstName: 'Sean', lastName: 'Parr'}];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -192,7 +198,7 @@ describe('Throttle test', function() {
 
         it('should allow overriding of the nextCheck method and allow it to throw a error, and this error should propagate', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -200,8 +206,8 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
-                return new Promise((resolve, reject) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                return new Promise<string>((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
             };
@@ -210,7 +216,7 @@ describe('Throttle test', function() {
             const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
             /* When */
-            const nextCheck = status => {
+            const nextCheck = (status: Result<string>) => {
                 return new Promise<boolean>((resolve, reject) => {
                     if (status.amountStarted > 2) {
                         return reject(new Error('Throw after 2 tasks started'));
@@ -235,7 +241,7 @@ describe('Throttle test', function() {
 
         it("should throw when a task isn't a function", async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -243,8 +249,8 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
-                return new Promise((resolve, reject) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                return new Promise<string>((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
             };
@@ -266,7 +272,7 @@ describe('Throttle test', function() {
 
         it('should return the task if its not a function and the ignoreIsFunctionCheck is true', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -274,8 +280,8 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
-                return new Promise((resolve, reject) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                return new Promise<string>((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
             };
@@ -298,7 +304,7 @@ describe('Throttle test', function() {
 
         it('should call the callback function every time a task is done', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -306,8 +312,8 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
-                return new Promise((resolve, reject) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                return new Promise<string>((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
             };
@@ -325,7 +331,7 @@ describe('Throttle test', function() {
 
         it('should eventually stop if the nextTaskCheck returns false', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -338,8 +344,8 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
-                return new Promise((resolve, reject) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                return new Promise<string>((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
             };
@@ -348,7 +354,7 @@ describe('Throttle test', function() {
             const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
 
             /* When */
-            const nextCheck = status => {
+            const nextCheck = (status: Result<string>) => {
                 return new Promise<boolean>((resolve, reject) => {
                     if (status.amountStarted >= 6) {
                         return resolve(false);
@@ -370,7 +376,7 @@ describe('Throttle test', function() {
     describe('all', function() {
         it('should only return the taskResults', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -378,7 +384,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -397,7 +403,7 @@ describe('Throttle test', function() {
 
         it('should only return a single Error if a task failed', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -405,7 +411,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     reject(new Error('noes'));
                 });
@@ -428,7 +434,7 @@ describe('Throttle test', function() {
 
         it('should continue if a error occurred when failFast is false', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -436,7 +442,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     reject(new Error('noes'));
                 });
@@ -454,7 +460,7 @@ describe('Throttle test', function() {
 
         it("should throw if one task isn't a function", async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -462,7 +468,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -487,7 +493,7 @@ describe('Throttle test', function() {
     describe('sync', function() {
         it('should only return the taskResults', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -495,7 +501,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
@@ -514,7 +520,7 @@ describe('Throttle test', function() {
 
         it('should only return a single Error if a task failed', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -522,7 +528,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     reject(new Error('noes'));
                 });
@@ -545,7 +551,7 @@ describe('Throttle test', function() {
 
         it('should continue if a error occurred when failFast is false', async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -553,7 +559,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     reject(new Error('noes'));
                 });
@@ -571,7 +577,7 @@ describe('Throttle test', function() {
 
         it("should throw if one task isn't a function", async function() {
             /* Given */
-            const names = [
+            const names: Person[] = [
                 {firstName: 'Irene', lastName: 'Pullman'},
                 {firstName: 'Sean', lastName: 'Parr'},
                 {firstName: 'Joe', lastName: 'Slater'},
@@ -579,7 +585,7 @@ describe('Throttle test', function() {
                 {firstName: 'Tim', lastName: 'Black'}
             ];
 
-            const combineNames = (firstName, lastName) => {
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
                 return new Promise((resolve, reject) => {
                     resolve(firstName + ' ' + lastName);
                 });
