@@ -1,4 +1,4 @@
-const Throttle = require('../build/throttle');
+const Throttle = require('../dist/lib/throttle');
 
 //array of array containing a firstName and lastName we want to combine.
 const names = [

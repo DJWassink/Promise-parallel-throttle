@@ -13,3 +13,4 @@ coverage/
 .prettierrc
 tsconfig.json
 tslint.json
+.rpt2_cache/
