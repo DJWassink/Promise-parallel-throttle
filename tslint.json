@@ -17,7 +17,6 @@
         "no-var-requires": false,
         "no-misused-new": false,
         "prefer-for-of": true,
-        "promise-function-async": true,
         "await-promise": true,
         "no-floating-promises": true,
         "no-console": [true, "log", "error"],

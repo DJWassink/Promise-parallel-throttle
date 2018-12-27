@@ -9,3 +9,7 @@ yarn-error.log
 .travis.yml
 karma.config.js
 mocha.config.js
+coverage/
+.prettierrc
+tsconfig.json
+tslint.json
