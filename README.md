@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/DJWassink/Promise-parallel-throttle.svg?branch=master)](https://travis-ci.org/DJWassink/Promise-parallel-throttle)
 [![npm version](https://badge.fury.io/js/promise-parallel-throttle.svg)](https://badge.fury.io/js/promise-parallel-throttle)
 [![npm downloads](https://img.shields.io/npm/dm/promise-parallel-throttle.svg)](https://www.npmjs.com/package/promise-parallel-throttle)
-[![Bundlephobia](https://img.shields.io/badge/dynamic/json.svg?label=minified%20size&url=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dpromise-parallel-throttle%26record%3Dtrue&query=size&suffix=%20bytes&colorB=%230a7bbc)](https://bundlephobia.com/result?p=promise-parallel-throttle)
-[![Bundlephobia](https://img.shields.io/badge/dynamic/json.svg?label=minzipped%20size&url=https%3A%2F%2Fbundlephobia.com%2Fapi%2Fsize%3Fpackage%3Dpromise-parallel-throttle%26record%3Dtrue&query=gzip&suffix=%20bytes&colorB=%230a7bbc)](https://bundlephobia.com/result?p=promise-parallel-throttle)
+[![Bundlephobia](https://badgen.net/bundlephobia/min/promise-parallel-throttle)](https://bundlephobia.com/result?p=promise-parallel-throttle)
+[![Bundlephobia](https://badgen.net/bundlephobia/minzip/promise-parallel-throttle)](https://bundlephobia.com/result?p=promise-parallel-throttle)
 
 Run a array of Promises in parallel. Kinda like Promise.all(), but throttled!
 
