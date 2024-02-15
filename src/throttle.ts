@@ -75,28 +75,36 @@ export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>
 
         let failedFast = false;
         let currentTaskIndex = 0;
+
+        const handleError = (error: T, index: number) => {
+            result.taskResults[index] = error;
+            result.rejectedIndexes.push(index);
+            result.amountRejected++;
+            if (myOptions.failFast === true) {
+                failedFast = true;
+                return reject(result);
+            }
+            taskDone();
+        };
+
         const executeTask = (index: number) => {
             result.amountStarted++;
-
             if (typeof tasks[index] === 'function') {
-                tasks[index]().then(
-                    taskResult => {
-                        result.taskResults[index] = taskResult;
-                        result.resolvedIndexes.push(index);
-                        result.amountResolved++;
-                        taskDone();
-                    },
-                    error => {
-                        result.taskResults[index] = error;
-                        result.rejectedIndexes.push(index);
-                        result.amountRejected++;
-                        if (myOptions.failFast === true) {
-                            failedFast = true;
-                            return reject(result);
+                try {
+                    tasks[index]().then(
+                        taskResult => {
+                            result.taskResults[index] = taskResult;
+                            result.resolvedIndexes.push(index);
+                            result.amountResolved++;
+                            taskDone();
+                        },
+                        error => {
+                            handleError(error, index);
                         }
-                        taskDone();
-                    }
-                );
+                    );
+                } catch (err) {
+                    handleError(err as T, index);
+                }
             } else if (myOptions.ignoreIsFunctionCheck === true) {
                 result.taskResults[index] = (tasks[index] as any) as T;
                 result.resolvedIndexes.push(index);

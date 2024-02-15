@@ -371,6 +371,29 @@ describe('Throttle test', function() {
             expect(result.nextCheckFalseyIndexes).toHaveLength(4);
             expect(result.amountStarted).toEqual(6);
         });
+
+        it('should reject if task throws', async () => {
+            /* Given */
+            const names: Person[] = [
+                {firstName: 'Irene', lastName: 'Pullman'},
+                {firstName: 'Sean', lastName: 'Parr'},
+                {firstName: 'Joe', lastName: 'Slater'},
+                {firstName: 'Karen', lastName: 'Turner'},
+                {firstName: 'Tim', lastName: 'Black'}
+            ];
+
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                throw new Error('oh no somethings gone wrong');
+            };
+
+            //Create a array of functions to be run
+            const tasks = names.map(u => () => combineNames(u.firstName, u.lastName));
+
+            /* When */
+            const taskResults = await Throttle.raw(tasks);
+            expect(taskResults.amountDone).toBe(names.length);
+            expect(taskResults.amountRejected).toBe(names.length);
+        });
     });
 
     describe('all', function() {
