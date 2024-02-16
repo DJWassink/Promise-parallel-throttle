@@ -20,6 +20,7 @@
         "await-promise": true,
         "no-floating-promises": true,
         "no-console": [true, "log", "error"],
+        "no-shadowed-variable": false,
         "ordered-imports": [
             true,
             {
