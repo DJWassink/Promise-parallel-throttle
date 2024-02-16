@@ -1,6 +1,6 @@
 # Promise-parallel-throttle
 
-[![Build Status](https://travis-ci.org/DJWassink/Promise-parallel-throttle.svg?branch=master)](https://travis-ci.org/DJWassink/Promise-parallel-throttle)
+[![Build Status](https://github.com/DJWassink/Promise-parallel-throttle/actions/workflows/main.yml/badge.svg)](https://travis-ci.org/DJWassink/Promise-parallel-throttle)
 [![npm version](https://badge.fury.io/js/promise-parallel-throttle.svg)](https://badge.fury.io/js/promise-parallel-throttle)
 [![npm downloads](https://img.shields.io/npm/dm/promise-parallel-throttle.svg)](https://www.npmjs.com/package/promise-parallel-throttle)
 [![Bundlephobia](https://badgen.net/bundlephobia/min/promise-parallel-throttle)](https://bundlephobia.com/result?p=promise-parallel-throttle)
