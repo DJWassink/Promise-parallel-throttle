@@ -1,6 +1,6 @@
 {
     "name": "promise-parallel-throttle",
-    "version": "3.4.0",
+    "version": "3.4.1",
     "keywords": [
         "promise",
         "async",
@@ -75,9 +75,5 @@
         "tslint-config-prettier": "^1.18.0",
         "tslint-eslint-rules": "^5.4.0",
         "typescript": "^5.3.3"
-    },
-    "engines": {
-        "node": ">=20.11.0",
-        "yarn": ">=1.22.0"
     }
 }
