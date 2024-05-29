@@ -332,6 +332,35 @@ describe('Throttle test', function () {
             expect(progressCallback).toHaveBeenCalledTimes(5);
         });
 
+        it('should call the callback function with the just completed index', async function () {
+            /* Given */
+            const names: Person[] = [
+                {firstName: 'Irene', lastName: 'Pullman'},
+                {firstName: 'Sean', lastName: 'Parr'},
+                {firstName: 'Joe', lastName: 'Slater'},
+                {firstName: 'Karen', lastName: 'Turner'},
+                {firstName: 'Tim', lastName: 'Black'},
+            ];
+
+            const combineNames = (firstName: string, lastName: string): Promise<string> => {
+                return new Promise<string>((resolve, reject) => {
+                    resolve(firstName + ' ' + lastName);
+                });
+            };
+
+            //Create a array of functions to be run
+            const tasks = names.map((u) => () => combineNames(u.firstName, u.lastName));
+
+            /* When */
+            const indexes = new Set<number>();
+            const {taskResults: formattedNames} = await Throttle.raw(tasks, {
+                progressCallback: (res) => indexes.add(res.lastCompletedIndex),
+            });
+
+            /* Then */
+            expect(indexes).toEqual(new Set([0, 1, 2, 3, 4]));
+        });
+
         it('should eventually stop if the nextTaskCheck returns false', async function () {
             /* Given */
             const names: Person[] = [
