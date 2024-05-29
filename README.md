@@ -33,10 +33,13 @@ const doReq = async (firstName, lastName) => {
     return firstName + ' ' + lastName;
 };
 
-const users = [{firstName: 'Irene', lastName: 'Pullman'}, {firstName: 'Sean', lastName: 'Parr'}];
+const users = [
+    {firstName: 'Irene', lastName: 'Pullman'},
+    {firstName: 'Sean', lastName: 'Parr'},
+];
 
 //Queue with functions to be run
-const queue = users.map(user => () => doReq(user.firstName, user.lastName));
+const queue = users.map((user) => () => doReq(user.firstName, user.lastName));
 
 //Default Throttle runs with 5 promises parallel.
 const formattedNames = await Throttle.all(queue);
@@ -86,6 +89,7 @@ The `progressCallback` and the `Raw` will return a `Result` object with the foll
 
 | Property               | Type    | Start value | Definition                                                                                   |
 | :--------------------- | :------ | :---------- | :------------------------------------------------------------------------------------------- |
+| lastCompletedIndex     | Integer | -1          | last index of a task that is completed (either fulfilled or rejected)                        |
 | amountDone             | Integer | 0           | amount of tasks which are finished                                                           |
 | amountStarted          | Integer | 0           | amount of tasks which started                                                                |
 | amountResolved         | Integer | 0           | amount of tasks which successfully resolved                                                  |

@@ -1,6 +1,7 @@
 const DEFAULT_MAX = 5;
 
 export interface Result<T> {
+    lastCompletedIndex: number;
     amountDone: number;
     amountStarted: number;
     amountResolved: number;
@@ -41,7 +42,7 @@ const DEFAULT_OPTIONS = {
     maxInProgress: DEFAULT_MAX,
     failFast: false,
     nextCheck: defaultNextTaskCheck,
-    ignoreIsFunctionCheck: false
+    ignoreIsFunctionCheck: false,
 };
 
 export type Task<T> = () => Promise<T>;
@@ -58,6 +59,7 @@ export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>
     return new Promise<Result<T>>((resolve, reject) => {
         const myOptions = Object.assign({}, DEFAULT_OPTIONS, options);
         const result: Result<T> = {
+            lastCompletedIndex: -1,
             amountDone: 0,
             amountStarted: 0,
             amountResolved: 0,
@@ -66,7 +68,7 @@ export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>
             rejectedIndexes: [],
             resolvedIndexes: [],
             nextCheckFalseyIndexes: [],
-            taskResults: []
+            taskResults: [],
         };
 
         if (tasks.length === 0) {
@@ -81,10 +83,11 @@ export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>
             result.rejectedIndexes.push(index);
             result.amountRejected++;
             if (myOptions.failFast === true) {
+                result.lastCompletedIndex = index;
                 failedFast = true;
                 return reject(result);
             }
-            taskDone();
+            taskDone(index);
         };
 
         const executeTask = (index: number) => {
@@ -92,41 +95,42 @@ export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>
             if (typeof tasks[index] === 'function') {
                 try {
                     tasks[index]().then(
-                        taskResult => {
+                        (taskResult) => {
                             result.taskResults[index] = taskResult;
                             result.resolvedIndexes.push(index);
                             result.amountResolved++;
-                            taskDone();
+                            taskDone(index);
                         },
-                        error => {
+                        (error) => {
                             handleError(error, index);
-                        }
+                        },
                     );
                 } catch (err) {
                     handleError(err as T, index);
                 }
             } else if (myOptions.ignoreIsFunctionCheck === true) {
-                result.taskResults[index] = (tasks[index] as any) as T;
+                result.taskResults[index] = tasks[index] as any as T;
                 result.resolvedIndexes.push(index);
                 result.amountResolved++;
-                taskDone();
+                taskDone(index);
             } else {
                 failedFast = true;
                 return reject(
-                    new Error('tasks[' + index + ']: ' + tasks[index] + ', is supposed to be of type function')
+                    new Error('tasks[' + index + ']: ' + tasks[index] + ', is supposed to be of type function'),
                 );
             }
         };
 
-        const taskDone = () => {
+        const taskDone = (index: number) => {
             //make sure no more tasks are spawned when we failedFast
             if (failedFast === true) {
                 return;
             }
 
             result.amountDone++;
-            if (typeof (myOptions as Options<T>).progressCallback === 'function') {
-                (myOptions as any).progressCallback(result);
+            result.lastCompletedIndex = index;
+            if (typeof myOptions.progressCallback === 'function') {
+                myOptions.progressCallback(result);
             }
             if (result.amountDone === tasks.length) {
                 return resolve(result);
@@ -138,14 +142,14 @@ export function raw<T>(tasks: Tasks<T>, options?: Options<T>): Promise<Result<T>
 
         const nextTask = (index: number) => {
             //check if we can execute the next task
-            myOptions.nextCheck(result, tasks).then(canExecuteNextTask => {
+            myOptions.nextCheck(result, tasks).then((canExecuteNextTask) => {
                 if (canExecuteNextTask === true) {
                     //execute it
                     executeTask(index);
                 } else {
                     result.amountNextCheckFalsey++;
                     result.nextCheckFalseyIndexes.push(index);
-                    taskDone();
+                    taskDone(index);
                 }
             }, reject);
         };
@@ -175,7 +179,7 @@ function executeRaw<T>(tasks: Tasks<T>, options: Options<T>): Promise<T[]> {
                 } else {
                     reject(error.taskResults[error.rejectedIndexes[0]]);
                 }
-            }
+            },
         );
     });
 }
